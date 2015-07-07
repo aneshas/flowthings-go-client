@@ -15,12 +15,13 @@ type MyDrop struct {
 func main() {
 
 	// Authenticate
-	identity := Identity{
-		Username: os.Getenv("FT_USERNAME"),
-		Token:    os.Getenv("FT_TOKEN"),
+	config := FlowConfig{
+		Username:  os.Getenv("FT_USERNAME"),
+		Token:     os.Getenv("FT_TOKEN"),
+		Websocket: false,
 	}
 
-	Ft, err := NewFlowthings(identity)
+	Ft, err := NewFlowthings(config)
 
 	if err != nil {
 		fmt.Println(err)
@@ -28,9 +29,11 @@ func main() {
 	}
 
 	// Create drop
+	dropRequest := new(DropRequest)
+
 	location := Location{
-		Lat: "87.89898989",
-		Lon: "87.8989",
+		Lat: 87.89898989,
+		Lon: 87.8989,
 	}
 
 	elems := MyDrop{
@@ -42,7 +45,12 @@ func main() {
 	elems.Nested["nested1"] = "nested value"
 	elems.Nested["nested2"] = "another nested value"
 
-	Ft.DropCreate("21092933", elems, location)
+	dropRequest.Elems = elems
+	dropRequest.FlowId = "939393099330"
+	dropRequest.Location = location
+	dropRequest.Path = "/anes/otoka"
+
+	Ft.DropCreate(dropRequest)
 
 	fmt.Println(Ft.SessionId)
 }

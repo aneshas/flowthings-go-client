@@ -8,12 +8,13 @@ import (
 type Flowthings struct {
 	SessionId string
 	Ws        *websocket.Conn
-	//Http
+	Config    *FlowConfig
 }
 
-type Identity struct {
-	Username string
-	Token    string
+type FlowConfig struct {
+	Username  string
+	Token     string
+	Websocket bool
 }
 
 type AuthResponse struct {
@@ -26,6 +27,13 @@ type responseHead struct {
 	Status   int
 	Messages []string
 	Errors   []string
+}
+
+type DropRequest struct {
+	Path     string      `json:"path,omitempty"`
+	FlowId   string      `json:"flowId,omitempty"`
+	Location Location    `json:"location,omitempty"`
+	Elems    interface{} `json:"elems"`
 }
 
 func (rh *responseHead) Error() string {
@@ -44,9 +52,9 @@ type authResponseBody struct {
 }
 
 type Location struct {
-	Lat        string
-	Lon        string
-	Specifiers map[string]string
+	Lat        float64           `json:"lat"`
+	Lon        float64           `json:"lon"`
+	Specifiers map[string]string `json:"specifiers,omitempty"`
 }
 
 type Drop struct {
