@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 
@@ -41,14 +42,14 @@ func openWebsocket(ft *Flowthings) {
 	//}
 }
 
-func flowHttpPostRequest(
-	payload []byte,
-	url string, ft *Flowthings) (resp *http.Response, err error) {
+func prepareHttpHeadersAndUrl(
+	method string,
+	url string,
+	body io.Reader, ft *Flowthings) (req *http.Request, err error) {
 
-	httpClient := http.Client{}
 	url = fmt.Sprintf(url, ft.Config.Username)
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
+	req, err = http.NewRequest(method, url, body)
 	if err != nil {
 		Logger.Error(err)
 		return
@@ -58,6 +59,23 @@ func flowHttpPostRequest(
 	req.Header.Add("X-Auth-Token", ft.Config.Token)
 	req.Header.Add("Content-Type", "application/json")
 
+	return
+}
+
+func flowHttpPostRequest(
+	payload []byte,
+	url string, ft *Flowthings) (resp *http.Response, err error) {
+
+	httpClient := http.Client{}
+	req, err := prepareHttpHeadersAndUrl("POST", url, bytes.NewBuffer(payload), ft)
+	resp, err = httpClient.Do(req)
+
+	return
+}
+
+func flowHttpDeleteRequest(url string, ft *Flowthings) (resp *http.Response, err error) {
+	httpClient := http.Client{}
+	req, err := prepareHttpHeadersAndUrl("DELETE", url, nil, ft)
 	resp, err = httpClient.Do(req)
 
 	return

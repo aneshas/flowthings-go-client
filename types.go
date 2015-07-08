@@ -21,11 +21,11 @@ type FlowConfig struct {
 }
 
 type AuthResponse struct {
-	Head responseHead
+	Head ResponseHead
 	Body authResponseBody
 }
 
-type responseHead struct {
+type ResponseHead struct {
 	Ok       bool
 	Status   int
 	Messages []string
@@ -39,12 +39,21 @@ type DropRequest struct {
 	Elems    interface{} `json:"elems"`
 }
 
-func (rh *responseHead) Error() string {
-	var str string
-	str = fmt.Sprintf("Error code: %d", rh.Status)
+func (rh *ResponseHead) Error() string {
+	str := fmt.Sprintf("Error code: %d", rh.Status)
 
 	for _, err := range rh.Errors {
 		str = fmt.Sprintf("%s\n%s\n", str, err)
+	}
+
+	return str
+}
+
+func (rh *ResponseHead) String() string {
+	str := fmt.Sprintf("Status code: %d", rh.Status)
+
+	for _, msg := range rh.Messages {
+		str = fmt.Sprintf("%s\n%s\n", str, msg)
 	}
 
 	return str
@@ -61,7 +70,7 @@ type Location struct {
 }
 
 type DropCreateResponse struct {
-	Head responseHead
+	Head ResponseHead
 	Body Drop
 }
 

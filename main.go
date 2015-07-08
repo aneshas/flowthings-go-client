@@ -64,4 +64,18 @@ func main() {
 	}
 
 	fmt.Println(drop)
+
+	// Delete drop
+	d := Drop{
+		FlowId: "f551d2c940cf213ccab26343d",
+		Id:     "d559d04375bb70963aca88045",
+	}
+
+	resp, err := Ft.DropDelete(&d)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println("RESP")
+	fmt.Println(resp)
 }
