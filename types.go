@@ -40,17 +40,11 @@ type DropRequest struct {
 }
 
 func (rh *ResponseHead) Error() string {
-	str := fmt.Sprintf("Error code: %d", rh.Status)
+	str := fmt.Sprintf("Status: %d", rh.Status)
 
 	for _, err := range rh.Errors {
 		str = fmt.Sprintf("%s\n%s\n", str, err)
 	}
-
-	return str
-}
-
-func (rh *ResponseHead) String() string {
-	str := fmt.Sprintf("Status code: %d", rh.Status)
 
 	for _, msg := range rh.Messages {
 		str = fmt.Sprintf("%s\n%s\n", str, msg)
@@ -97,5 +91,16 @@ func (d Drop) String() string {
 }
 
 // TODO implement io.ReadWriter for flow and Stringer for all primitives
-type Flow struct{}
-type Track struct{}
+type Flow struct {
+	Path        string `json:"path"`
+	Description string `json:"description,omitempty"`
+	Filter      string `json:"filter,omitempty"`
+	Capacity    int    `json:"capacity,omitempty"`
+}
+
+type Track struct {
+	Source      string   `json:"source"`
+	Destination []string `json:"destination"`
+	Filter      string   `json:"filter,omitempty"`
+	Js          string   `json:"js,omitempty"`
+}

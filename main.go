@@ -11,8 +11,6 @@ type MyDrop struct {
 	Nested map[string]string
 }
 
-var Logger ILogger
-
 func init() {
 	logger := DefaultLogger{}
 	logger.Init()
@@ -76,6 +74,5 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Println("RESP")
-	fmt.Println(resp)
+	fmt.Println(&resp)
 }

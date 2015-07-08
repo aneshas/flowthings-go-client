@@ -17,6 +17,7 @@ const (
 	WS_AUTH_URL              string = "https://ws.flowthings.io/session"
 	WS_URL                   string = "wss://ws.flowthings.io/session/%s/ws"
 	DROP_POST                string = "https://api.flowthings.io/v0.1/%s/drop"
+	StatusRequestSuccessfull int    = 200
 	StatusResourceUpdated    int    = 200
 	StatusResourceCreated    int    = 201
 	StatusBadRequest         int    = 400
@@ -24,22 +25,21 @@ const (
 	StatusServiceUnavailable int    = 503
 )
 
+var DebugLevel int
+var Logger ILogger
+
 func openWebsocket(ft *Flowthings) {
 	wsUrl := fmt.Sprintf(WS_URL, ft.SessionId)
 	wsOrigin, _ := os.Hostname()
 
-	//for {
 	ws, err := websocket.Dial(wsUrl, "", wsOrigin)
 	if err != nil {
 		Logger.Error(err)
 		Logger.Info("Connection failed. Reconnecting...")
 		return
-		//continue
 	}
 	Logger.Info("Websocket connection established.")
 	ft.Ws = ws
-	//break
-	//}
 }
 
 func prepareHttpHeadersAndUrl(

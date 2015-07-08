@@ -9,13 +9,10 @@ import (
 
 // HttpDropCreate creates a new drop via http api call
 func (ft *Flowthings) HttpDropCreate(dr *DropRequest) (resp *http.Response, err error) {
-
 	var url string = DROP_POST
 
 	if dr.FlowId != "" {
 		url = fmt.Sprintf("%s/%s", DROP_POST, dr.FlowId)
-
-		Logger.Info(url)
 
 		if dr.Path != "" {
 			dr.Path = ""
@@ -29,7 +26,7 @@ func (ft *Flowthings) HttpDropCreate(dr *DropRequest) (resp *http.Response, err 
 		return
 	}
 
-	resp, err = flowHttpPostRequest(payload, DROP_POST, ft)
+	resp, err = flowHttpPostRequest(payload, url, ft)
 
 	return
 }
@@ -83,9 +80,9 @@ func (ft *Flowthings) HttpDropDelete(d *Drop) (resp *http.Response, err error) {
 // DropDelete deletes a drop from a flow via http or websocket
 // If Drop Id is not provided, all drops from flow will be deleted
 func (ft *Flowthings) DropDelete(d *Drop) (rh ResponseHead, err error) {
-	deleteResp := new(struct {
+	deleteResp := struct {
 		Head ResponseHead
-	})
+	}{}
 	var resp *http.Response
 
 	if d.FlowId == "" {
