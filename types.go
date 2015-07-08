@@ -20,23 +20,11 @@ type FlowConfig struct {
 	Websocket bool
 }
 
-type AuthResponse struct {
-	Head ResponseHead
-	Body authResponseBody
-}
-
 type ResponseHead struct {
 	Ok       bool
 	Status   int
 	Messages []string
 	Errors   []string
-}
-
-type DropRequest struct {
-	Path     string      `json:"path,omitempty"`
-	FlowId   string      `json:"flowId,omitempty"`
-	Location Location    `json:"location,omitempty"`
-	Elems    interface{} `json:"elems"`
 }
 
 func (rh *ResponseHead) Error() string {
@@ -63,17 +51,14 @@ type Location struct {
 	Specifiers map[string]string `json:"specifiers,omitempty"`
 }
 
-type DropCreateResponse struct {
-	Head ResponseHead
-	Body Drop
-}
-
 type Drop struct {
-	Id           string   `json:"id"`
-	FlowId       string   `json:"flowId"`
-	CreationDate int64    `json:"creationDate"`
-	Path         string   `json:"path"`
-	Location     Location `json:"location"`
+	Id           string      `json:"id,omitempty"`
+	FlowId       string      `json:"flowId,omitempty"`
+	CreationDate int64       `json:"creationDate,omitempty"`
+	Path         string      `json:"path,omitempty"`
+	Location     Location    `json:"location,omitempty"`
+	Fhash        string      `json:"fhash,omitempty"`
+	Elems        interface{} `json:"elems,omitempty"`
 }
 
 func (d Drop) String() string {

@@ -109,7 +109,10 @@ func NewFlowthings(config FlowConfig) (ft *Flowthings, err error) {
 	}
 	defer resp.Body.Close()
 
-	response := new(AuthResponse)
+	response := struct {
+		Head ResponseHead
+		Body authResponseBody
+	}{}
 	json.NewDecoder(resp.Body).Decode(&response)
 	if response.Head.Status != StatusResourceCreated {
 		err = &response.Head

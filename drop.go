@@ -8,7 +8,7 @@ import (
 )
 
 // HttpDropCreate creates a new drop via http api call
-func (ft *Flowthings) HttpDropCreate(dr *DropRequest) (resp *http.Response, err error) {
+func (ft *Flowthings) HttpDropCreate(dr *Drop) (resp *http.Response, err error) {
 	var url string = DROP_POST
 
 	if dr.FlowId != "" {
@@ -32,7 +32,7 @@ func (ft *Flowthings) HttpDropCreate(dr *DropRequest) (resp *http.Response, err 
 }
 
 // DropCreate creates a new drop via http or websocket
-func (ft *Flowthings) DropCreate(dr *DropRequest) (drop Drop, err error) {
+func (ft *Flowthings) DropCreate(dr *Drop) (drop Drop, err error) {
 	var resp *http.Response
 
 	if !ft.Config.Websocket {
@@ -46,7 +46,10 @@ func (ft *Flowthings) DropCreate(dr *DropRequest) (drop Drop, err error) {
 		// Do Websocket request TODO create anoter function
 	}
 
-	dropCreateResp := DropCreateResponse{}
+	dropCreateResp := struct {
+		Head ResponseHead
+		Body Drop
+	}{}
 	json.NewDecoder(resp.Body).Decode(&dropCreateResp)
 
 	if dropCreateResp.Head.Status != StatusResourceCreated {

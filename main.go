@@ -34,7 +34,7 @@ func main() {
 	}
 
 	// Create drop
-	dropRequest := new(DropRequest)
+	dropRequest := new(Drop)
 
 	location := Location{
 		Lat: 87.89898989,
