@@ -1,12 +1,11 @@
 // Flowthings.io Go package
-// Manage your drops, flows and tracks
+// Manage drops, flows and tracks
 package main
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -14,27 +13,29 @@ import (
 )
 
 const (
-	WS_AUTH_URL string = "https://ws.flowthings.io/session"
-	WS_URL      string = "wss://ws.flowthings.io/session/%s/ws"
-
-	DROP_POST string = "https://api.flowthings.io/v0.1/%s/drop/"
+	WS_AUTH_URL              string = "https://ws.flowthings.io/session"
+	WS_URL                   string = "wss://ws.flowthings.io/session/%s/ws"
+	DROP_POST                string = "https://api.flowthings.io/v0.1/%s/drop"
+	StatusResourceUpdated    int    = 200
+	StatusResourceCreated    int    = 201
+	StatusBadRequest         int    = 400
+	StatusUnauthorized       int    = 401
+	StatusServiceUnavailable int    = 503
 )
 
 func openWebsocket(ft *Flowthings) {
 	wsUrl := fmt.Sprintf(WS_URL, ft.SessionId)
 	wsOrigin, _ := os.Hostname()
 
-	fmt.Println(wsUrl)
-
 	//for {
 	ws, err := websocket.Dial(wsUrl, "", wsOrigin)
 	if err != nil {
-		log.Println(err)
-		log.Println("Connection failed. Reconnecting...")
+		Logger.Error(err)
+		Logger.Info("Connection failed. Reconnecting...")
 		return
 		//continue
 	}
-	log.Println("Websocket connection established.")
+	Logger.Info("Websocket connection established.")
 	ft.Ws = ws
 	//break
 	//}
@@ -48,9 +49,8 @@ func flowHttpPostRequest(
 	url = fmt.Sprintf(url, ft.Config.Username)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(payload))
-
 	if err != nil {
-		log.Println(err)
+		Logger.Error(err)
 		return
 	}
 
@@ -63,20 +63,19 @@ func flowHttpPostRequest(
 	return
 }
 
+// NewFlowthings creates new Flowthings struct used for further operations on flowthings primitives
 func NewFlowthings(config FlowConfig) (ft *Flowthings, err error) {
 	ft = new(Flowthings)
 	ft.Config = new(FlowConfig)
 	ft.Config = &config
 
 	if !config.Websocket {
-
 		return
 	}
 
 	req, err := http.NewRequest("POST", WS_AUTH_URL, nil)
-
 	if err != nil {
-		log.Println(err)
+		Logger.Error(err)
 		return
 	}
 
@@ -84,19 +83,17 @@ func NewFlowthings(config FlowConfig) (ft *Flowthings, err error) {
 	req.Header.Add("X-Auth-Token", config.Token)
 
 	httpClient := http.Client{}
-	resp, err := httpClient.Do(req)
 
+	resp, err := httpClient.Do(req)
 	if err != nil {
-		log.Println(err)
+		Logger.Error(err)
 		return
 	}
-
 	defer resp.Body.Close()
 
 	response := new(AuthResponse)
 	json.NewDecoder(resp.Body).Decode(&response)
-
-	if !response.Head.Ok {
+	if response.Head.Status != StatusResourceCreated {
 		err = &response.Head
 		return
 	}

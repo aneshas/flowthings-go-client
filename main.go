@@ -11,7 +11,15 @@ type MyDrop struct {
 	Nested map[string]string
 }
 
-// TODO Flowthings cli for testing
+var Logger ILogger
+
+func init() {
+	logger := DefaultLogger{}
+	logger.Init()
+	Logger = &logger
+}
+
+// TODO Flowthings cli
 func main() {
 
 	// Authenticate
@@ -22,7 +30,6 @@ func main() {
 	}
 
 	Ft, err := NewFlowthings(config)
-
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -46,11 +53,15 @@ func main() {
 	elems.Nested["nested2"] = "another nested value"
 
 	dropRequest.Elems = elems
-	dropRequest.FlowId = "939393099330"
+	dropRequest.FlowId = "f551d2c940cf213ccab26343d"
 	dropRequest.Location = location
 	dropRequest.Path = "/anes/otoka"
 
-	Ft.DropCreate(dropRequest)
+	drop, err := Ft.DropCreate(dropRequest)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	fmt.Println(Ft.SessionId)
+	fmt.Println(drop)
 }
