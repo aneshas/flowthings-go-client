@@ -27,14 +27,13 @@ func main() {
 		Websocket: false,
 	}
 
-	Ft, err := NewFlowthings(config)
+	_, err := NewFlowthings(config)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// Create drop
-	dropRequest := new(Drop)
 
 	location := Location{
 		Lat: 87.89898989,
@@ -46,16 +45,17 @@ func main() {
 		Bar:    "Baz",
 		Nested: make(map[string]string),
 	}
-
 	elems.Nested["nested1"] = "nested value"
 	elems.Nested["nested2"] = "another nested value"
 
-	dropRequest.Elems = elems
-	dropRequest.FlowId = "f551d2c940cf213ccab26343d"
-	dropRequest.Location = location
-	dropRequest.Path = "/anes/otoka"
+	drop := Drop{
+		Elems:    elems,
+		FlowId:   "f551d2c940cf213ccab26343d",
+		Location: location,
+		Path:     "/anes/otoka",
+	}
 
-	drop, err := Ft.DropCreate(dropRequest)
+	err = drop.Create()
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -63,16 +63,38 @@ func main() {
 
 	fmt.Println(drop)
 
-	// Delete drop
-	d := Drop{
-		FlowId: "f551d2c940cf213ccab26343d",
-		Id:     "d559d04375bb70963aca88045",
-	}
+	// Update drop
 
-	resp, err := Ft.DropDelete(&d)
+	// Delete drop
+	/*
+		d := Drop{
+			FlowId: "f551d2c940cf213ccab26343d",
+			Id:     "d559d04375bb70963aca88045",
+		}
+
+		resp, err := d.Delete()
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		fmt.Println(&resp)
+	*/
+
+	// Read drop
+	d := Drop{}
+	d.FlowId = "f551d2c940cf213ccab26343d"
+	d.Id = "d559e28a368056d2d0fc1c866"
+
+	err = d.Read()
+
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
-	fmt.Println(&resp)
+	fmt.Println("Drop read:")
+	fmt.Println(d)
+	//	fmt.Println(d.Elems["bar"]["value"])
+	// fmt.Println(d.Elems.Bar)
+
 }

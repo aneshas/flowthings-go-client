@@ -17,6 +17,7 @@ const (
 	WS_AUTH_URL              string = "https://ws.flowthings.io/session"
 	WS_URL                   string = "wss://ws.flowthings.io/session/%s/ws"
 	DROP_POST                string = "https://api.flowthings.io/v0.1/%s/drop"
+	StatusResourceDeleted    int    = 200
 	StatusRequestSuccessfull int    = 200
 	StatusResourceUpdated    int    = 200
 	StatusResourceCreated    int    = 201
@@ -27,9 +28,10 @@ const (
 
 var DebugLevel int
 var Logger ILogger
+var flowthings *Flowthings
 
-func openWebsocket(ft *Flowthings) {
-	wsUrl := fmt.Sprintf(WS_URL, ft.SessionId)
+func openWebsocket() {
+	wsUrl := fmt.Sprintf(WS_URL, flowthings.SessionId)
 	wsOrigin, _ := os.Hostname()
 
 	ws, err := websocket.Dial(wsUrl, "", wsOrigin)
@@ -39,15 +41,15 @@ func openWebsocket(ft *Flowthings) {
 		return
 	}
 	Logger.Info("Websocket connection established.")
-	ft.Ws = ws
+	flowthings.Ws = ws
 }
 
 func prepareHttpHeadersAndUrl(
 	method string,
 	url string,
-	body io.Reader, ft *Flowthings) (req *http.Request, err error) {
+	body io.Reader) (req *http.Request, err error) {
 
-	url = fmt.Sprintf(url, ft.Config.Username)
+	url = fmt.Sprintf(url, flowthings.Config.Username)
 
 	req, err = http.NewRequest(method, url, body)
 	if err != nil {
@@ -55,27 +57,35 @@ func prepareHttpHeadersAndUrl(
 		return
 	}
 
-	req.Header.Add("X-Auth-Account", ft.Config.Username)
-	req.Header.Add("X-Auth-Token", ft.Config.Token)
+	req.Header.Add("X-Auth-Account", flowthings.Config.Username)
+	req.Header.Add("X-Auth-Token", flowthings.Config.Token)
 	req.Header.Add("Content-Type", "application/json")
+
+	return
+}
+
+func flowHttpGetRequest(url string) (resp *http.Response, err error) {
+	httpClient := http.Client{}
+	req, err := prepareHttpHeadersAndUrl("GET", url, nil)
+	resp, err = httpClient.Do(req)
 
 	return
 }
 
 func flowHttpPostRequest(
 	payload []byte,
-	url string, ft *Flowthings) (resp *http.Response, err error) {
+	url string) (resp *http.Response, err error) {
 
 	httpClient := http.Client{}
-	req, err := prepareHttpHeadersAndUrl("POST", url, bytes.NewBuffer(payload), ft)
+	req, err := prepareHttpHeadersAndUrl("POST", url, bytes.NewBuffer(payload))
 	resp, err = httpClient.Do(req)
 
 	return
 }
 
-func flowHttpDeleteRequest(url string, ft *Flowthings) (resp *http.Response, err error) {
+func flowHttpDeleteRequest(url string) (resp *http.Response, err error) {
 	httpClient := http.Client{}
-	req, err := prepareHttpHeadersAndUrl("DELETE", url, nil, ft)
+	req, err := prepareHttpHeadersAndUrl("DELETE", url, nil)
 	resp, err = httpClient.Do(req)
 
 	return
@@ -86,6 +96,7 @@ func NewFlowthings(config FlowConfig) (ft *Flowthings, err error) {
 	ft = new(Flowthings)
 	ft.Config = new(FlowConfig)
 	ft.Config = &config
+	flowthings = ft
 
 	if !config.Websocket {
 		return
@@ -120,7 +131,7 @@ func NewFlowthings(config FlowConfig) (ft *Flowthings, err error) {
 	}
 
 	ft.SessionId = response.Body.Id
-	openWebsocket(ft)
+	openWebsocket()
 
 	return
 }

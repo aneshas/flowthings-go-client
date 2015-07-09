@@ -7,8 +7,8 @@ import (
 	"net/http"
 )
 
-// HttpDropCreate creates a new drop via http api call
-func (ft *Flowthings) HttpDropCreate(dr *Drop) (resp *http.Response, err error) {
+// HttpCreate creates a new drop via http api call
+func (dr *Drop) HttpCreate() (resp *http.Response, err error) {
 	var url string = DROP_POST
 
 	if dr.FlowId != "" {
@@ -26,17 +26,17 @@ func (ft *Flowthings) HttpDropCreate(dr *Drop) (resp *http.Response, err error) 
 		return
 	}
 
-	resp, err = flowHttpPostRequest(payload, url, ft)
+	resp, err = flowHttpPostRequest(payload, url)
 
 	return
 }
 
-// DropCreate creates a new drop via http or websocket
-func (ft *Flowthings) DropCreate(dr *Drop) (drop Drop, err error) {
+// Create creates a new drop via http or websocket
+func (dr *Drop) Create() (err error) {
 	var resp *http.Response
 
-	if !ft.Config.Websocket {
-		resp, err = ft.HttpDropCreate(dr)
+	if !flowthings.Config.Websocket {
+		resp, err = dr.HttpCreate()
 		if err != nil {
 			Logger.Error(err)
 			return
@@ -50,20 +50,20 @@ func (ft *Flowthings) DropCreate(dr *Drop) (drop Drop, err error) {
 		Head ResponseHead
 		Body Drop
 	}{}
-	json.NewDecoder(resp.Body).Decode(&dropCreateResp)
 
+	json.NewDecoder(resp.Body).Decode(&dropCreateResp)
 	if dropCreateResp.Head.Status != StatusResourceCreated {
 		err = &dropCreateResp.Head
 		return
 	}
 
-	drop = dropCreateResp.Body
+	*dr = dropCreateResp.Body
 
 	return
 }
 
-// HttpDropDelete deletes a drop from flow via http
-func (ft *Flowthings) HttpDropDelete(d *Drop) (resp *http.Response, err error) {
+// HttpDelete deletes a drop from flow via http
+func (d *Drop) HttpDelete() (resp *http.Response, err error) {
 	url := fmt.Sprintf("%s/%s", DROP_POST, d.FlowId)
 
 	if d.Id != "" {
@@ -72,7 +72,7 @@ func (ft *Flowthings) HttpDropDelete(d *Drop) (resp *http.Response, err error) {
 		Logger.Warning("Drop ID not set. Deleting all frops from flow.")
 	}
 
-	resp, err = flowHttpDeleteRequest(url, ft)
+	resp, err = flowHttpDeleteRequest(url)
 	if err != nil {
 		Logger.Error(err)
 	}
@@ -80,9 +80,9 @@ func (ft *Flowthings) HttpDropDelete(d *Drop) (resp *http.Response, err error) {
 	return
 }
 
-// DropDelete deletes a drop from a flow via http or websocket
+// Delete deletes a drop from a flow via http or websocket
 // If Drop Id is not provided, all drops from flow will be deleted
-func (ft *Flowthings) DropDelete(d *Drop) (rh ResponseHead, err error) {
+func (d *Drop) Delete() (rh ResponseHead, err error) {
 	deleteResp := struct {
 		Head ResponseHead
 	}{}
@@ -93,8 +93,8 @@ func (ft *Flowthings) DropDelete(d *Drop) (rh ResponseHead, err error) {
 		return
 	}
 
-	if !ft.Config.Websocket {
-		resp, err = ft.HttpDropDelete(d)
+	if !flowthings.Config.Websocket {
+		resp, err = d.HttpDelete()
 		if err != nil {
 			Logger.Error(err)
 			return
@@ -103,7 +103,69 @@ func (ft *Flowthings) DropDelete(d *Drop) (rh ResponseHead, err error) {
 	}
 
 	json.NewDecoder(resp.Body).Decode(&deleteResp)
+	if deleteResp.Head.Status != StatusResourceDeleted {
+		err = &deleteResp.Head
+		return
+	}
 	rh = deleteResp.Head
+	emptyDrop := Drop{}
+	*d = emptyDrop
 
 	return
 }
+
+// HttpRead reads a single drop from a specific flow via http api request
+func (d *Drop) HttpRead() (resp *http.Response, err error) {
+	url := fmt.Sprintf("%s/%s/%s", DROP_POST, d.FlowId, d.Id)
+	resp, err = flowHttpGetRequest(url)
+	return
+}
+
+// Read reads a single drop from a specific flow
+func (d *Drop) Read() (err error) {
+	if d.FlowId == "" || d.Id == "" {
+		err = errors.New("Id and FlowId must be set")
+		return
+	}
+
+	var resp *http.Response
+
+	readResponse := struct {
+		Head ResponseHead
+		Body Drop
+	}{}
+	readResponse.Body = *d
+
+	if !flowthings.Config.Websocket {
+		resp, err = d.HttpRead()
+		if err != nil {
+			Logger.Error(err)
+			return
+		}
+		defer resp.Body.Close()
+	}
+
+	json.NewDecoder(resp.Body).Decode(&readResponse)
+	if readResponse.Head.Status != StatusRequestSuccessfull {
+		err = &readResponse.Head
+		return
+	}
+
+	*d = readResponse.Body
+
+	return
+}
+
+/*
+TODO
+Change drop receiverst to Drop struct
+remove return drops (use receiver struct)
+
+Flow methods:
+- TrackFrom
+- TrackTo
+
+Track methods:
+- AddFlow
+- RemoveFlow
+*/
