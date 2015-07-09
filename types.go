@@ -77,10 +77,12 @@ func (d Drop) String() string {
 
 // TODO implement io.ReadWriter for flow and Stringer for all primitives
 type Flow struct {
-	Path        string `json:"path"`
-	Description string `json:"description,omitempty"`
-	Filter      string `json:"filter,omitempty"`
-	Capacity    int    `json:"capacity,omitempty"`
+	Path         string `json:"path"`
+	Description  string `json:"description,omitempty"`
+	Filter       string `json:"filter,omitempty"`
+	Capacity     int    `json:"capacity,omitempty"`
+	CreationDate int64  `json:"creationDate,omitempty"`
+	LastEditDate int64  `json:lastEditDate,omitempty`
 }
 
 type Track struct {

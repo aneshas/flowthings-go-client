@@ -33,43 +33,46 @@ func main() {
 		return
 	}
 
-	// Create drop
+	/* Flows */
 
-	location := Location{
-		Lat: 87.89898989,
-		Lon: 87.8989,
-	}
-
-	elems := MyDrop{
-		Foo:    "Bar",
-		Bar:    "Baz",
-		Nested: make(map[string]string),
-	}
-	elems.Nested["nested1"] = "nested value"
-	elems.Nested["nested2"] = "another nested value"
-
-	drop := Drop{
-		Elems:    elems,
-		FlowId:   "f551d2c940cf213ccab26343d",
-		Location: location,
-		Path:     "/anes/otoka",
-	}
-
-	err = drop.Create()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println(drop)
-
-	// Update drop
-	elems.Bar = "Updated bar, yaay :D"
-	drop.Elems = elems
-	drop.Update()
-
-	// Delete drop
+	/* Drops */
 	/*
+		// Create drop
+
+		location := Location{
+			Lat: 87.89898989,
+			Lon: 87.8989,
+		}
+
+		elems := MyDrop{
+			Foo:    "Bar",
+			Bar:    "Baz",
+			Nested: make(map[string]string),
+		}
+		elems.Nested["nested1"] = "nested value"
+		elems.Nested["nested2"] = "another nested value"
+
+		drop := Drop{
+			Elems:    elems,
+			FlowId:   "f551d2c940cf213ccab26343d",
+			Location: location,
+			Path:     "/anes/otoka",
+		}
+
+		err = drop.Create()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		fmt.Println(drop)
+
+		// Update drop
+		elems.Bar = "Updated bar, yaay :D"
+		drop.Elems = elems
+		drop.Update()
+
+		// Delete drop
 		d := Drop{
 			FlowId: "f551d2c940cf213ccab26343d",
 			Id:     "d559d04375bb70963aca88045",
@@ -81,23 +84,21 @@ func main() {
 		}
 
 		fmt.Println(&resp)
+
+		// Read drop
+		dd := Drop{}
+		dd.FlowId = "f551d2c940cf213ccab26343d"
+		dd.Id = "d559e28a368056d2d0fc1c866"
+
+		err = d.Read()
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		fmt.Println("Drop read:")
+		fmt.Println(d)
 	*/
-
-	// Read drop
-	d := Drop{}
-	d.FlowId = "f551d2c940cf213ccab26343d"
-	d.Id = "d559e28a368056d2d0fc1c866"
-
-	err = d.Read()
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println("Drop read:")
-	fmt.Println(d)
-	//	fmt.Println(d.Elems["bar"]["value"])
-	// fmt.Println(d.Elems.Bar)
 
 }
