@@ -10,6 +10,7 @@ import (
 // HttpCreate creates a new drop via http api call
 func (dr *Drop) HttpCreate() (resp *http.Response, err error) {
 	var url string = DROP_POST
+	var method string = "POST"
 
 	if dr.FlowId != "" {
 		url = fmt.Sprintf("%s/%s", DROP_POST, dr.FlowId)
@@ -26,7 +27,11 @@ func (dr *Drop) HttpCreate() (resp *http.Response, err error) {
 		return
 	}
 
-	resp, err = flowHttpPostRequest(payload, url)
+	if dr.Id != "" {
+		method = "PUT"
+		url = fmt.Sprintf("%s/%s", url, dr.Id)
+	}
+	resp, err = flowHttpRequest(method, payload, url)
 
 	return
 }
@@ -52,14 +57,18 @@ func (dr *Drop) Create() (err error) {
 	}{}
 
 	json.NewDecoder(resp.Body).Decode(&dropCreateResp)
-	if dropCreateResp.Head.Status != StatusResourceCreated {
+	if dropCreateResp.Head.Status != StatusResourceCreated && dropCreateResp.Head.Status != StatusResourceUpdated {
 		err = &dropCreateResp.Head
 		return
 	}
-
 	*dr = dropCreateResp.Body
 
 	return
+}
+
+// Update updates current drop
+func (dr *Drop) Update() (err error) {
+	return dr.Create()
 }
 
 // HttpDelete deletes a drop from flow via http

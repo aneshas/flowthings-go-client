@@ -64,6 +64,9 @@ func main() {
 	fmt.Println(drop)
 
 	// Update drop
+	elems.Bar = "Updated bar, yaay :D"
+	drop.Elems = elems
+	drop.Update()
 
 	// Delete drop
 	/*

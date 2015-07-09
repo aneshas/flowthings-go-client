@@ -72,12 +72,13 @@ func flowHttpGetRequest(url string) (resp *http.Response, err error) {
 	return
 }
 
-func flowHttpPostRequest(
+func flowHttpRequest(
+	method string,
 	payload []byte,
 	url string) (resp *http.Response, err error) {
 
 	httpClient := http.Client{}
-	req, err := prepareHttpHeadersAndUrl("POST", url, bytes.NewBuffer(payload))
+	req, err := prepareHttpHeadersAndUrl(method, url, bytes.NewBuffer(payload))
 	resp, err = httpClient.Do(req)
 
 	return
