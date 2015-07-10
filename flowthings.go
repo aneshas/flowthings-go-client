@@ -14,16 +14,18 @@ import (
 )
 
 const (
-	WS_AUTH_URL              string = "https://ws.flowthings.io/session"
-	WS_URL                   string = "wss://ws.flowthings.io/session/%s/ws"
-	DROP_POST                string = "https://api.flowthings.io/v0.1/%s/drop"
-	StatusResourceDeleted    int    = 200
-	StatusRequestSuccessfull int    = 200
-	StatusResourceUpdated    int    = 200
-	StatusResourceCreated    int    = 201
-	StatusBadRequest         int    = 400
-	StatusUnauthorized       int    = 401
-	StatusServiceUnavailable int    = 503
+	WS_AUTH_URL string = "https://ws.flowthings.io/session"
+	WS_URL      string = "wss://ws.flowthings.io/session/%s/ws"
+	DROP_POST   string = "https://api.flowthings.io/v0.1/%s/drop"
+	FLOW_POST   string = "https://api.flowthings.io/v0.1/%s/flow"
+
+	StatusResourceDeleted    int = 200
+	StatusRequestSuccessfull int = 200
+	StatusResourceUpdated    int = 200
+	StatusResourceCreated    int = 201
+	StatusBadRequest         int = 400
+	StatusUnauthorized       int = 401
+	StatusServiceUnavailable int = 503
 )
 
 var DebugLevel int
@@ -103,6 +105,7 @@ func NewFlowthings(config FlowConfig) (ft *Flowthings, err error) {
 		return
 	}
 
+	// TODO Refactor: use flowHttpRequest
 	req, err := http.NewRequest("POST", WS_AUTH_URL, nil)
 	if err != nil {
 		Logger.Error(err)

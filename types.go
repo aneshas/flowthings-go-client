@@ -62,13 +62,7 @@ type Drop struct {
 }
 
 func (d Drop) String() string {
-	timeStr := fmt.Sprintf("%d", d.CreationDate)
-	msInt, err := strconv.ParseInt(timeStr, 10, 64)
-	if err != nil {
-		Logger.Error(err)
-	}
-	t := time.Unix(0, msInt*int64(time.Millisecond))
-
+	t := getTime(d.CreationDate)
 	str := fmt.Sprintf("Id: %s\nFlowId: %s\nCreationDate: %s\nPath: %s",
 		d.Id, d.FlowId, t, d.Path)
 
@@ -77,6 +71,7 @@ func (d Drop) String() string {
 
 // TODO implement io.ReadWriter for flow and Stringer for all primitives
 type Flow struct {
+	Id           string `json:"id,omitempty"`
 	Path         string `json:"path"`
 	Description  string `json:"description,omitempty"`
 	Filter       string `json:"filter,omitempty"`
@@ -85,9 +80,28 @@ type Flow struct {
 	LastEditDate int64  `json:lastEditDate,omitempty`
 }
 
+func (f Flow) String() string {
+	t := getTime(f.CreationDate)
+	et := getTime(f.LastEditDate)
+
+	return fmt.Sprintf(
+		"Id: %s\nPath: %s\nDescription: %s\nFilter: %s\nCapacity: %d\nCreationDate: %s\nLasteEditDate: %s\n",
+		f.Id, f.Path, f.Description, f.Filter, f.Capacity, t, et)
+}
+
 type Track struct {
+	Id          string   `json:"id,omitempty"`
 	Source      string   `json:"source"`
-	Destination []string `json:"destination"`
 	Filter      string   `json:"filter,omitempty"`
 	Js          string   `json:"js,omitempty"`
+	Destination []string `json:"destination"`
+}
+
+func getTime(t int64) time.Time {
+	timeStr := fmt.Sprintf("%d", t)
+	msInt, err := strconv.ParseInt(timeStr, 10, 64)
+	if err != nil {
+		Logger.Error(err)
+	}
+	return time.Unix(0, msInt*int64(time.Millisecond))
 }

@@ -7,6 +7,12 @@ import (
 	"net/http"
 )
 
+/*
+TODO
+Track methods:
+- AddFlow
+- RemoveFlow
+*/
 // HttpCreate creates a new drop via http api call
 func (dr *Drop) HttpCreate() (resp *http.Response, err error) {
 	var url string = DROP_POST
@@ -32,7 +38,6 @@ func (dr *Drop) HttpCreate() (resp *http.Response, err error) {
 		url = fmt.Sprintf("%s/%s", url, dr.Id)
 	}
 	resp, err = flowHttpRequest(method, payload, url)
-
 	return
 }
 
@@ -57,12 +62,12 @@ func (dr *Drop) Create() (err error) {
 	}{}
 
 	json.NewDecoder(resp.Body).Decode(&dropCreateResp)
-	if dropCreateResp.Head.Status != StatusResourceCreated && dropCreateResp.Head.Status != StatusResourceUpdated {
+	if dropCreateResp.Head.Status != StatusResourceCreated &&
+		dropCreateResp.Head.Status != StatusResourceUpdated {
 		err = &dropCreateResp.Head
 		return
 	}
 	*dr = dropCreateResp.Body
-
 	return
 }
 
@@ -164,17 +169,3 @@ func (d *Drop) Read() (err error) {
 
 	return
 }
-
-/*
-TODO
-Change drop receiverst to Drop struct
-remove return drops (use receiver struct)
-
-Flow methods:
-- TrackFrom
-- TrackTo
-
-Track methods:
-- AddFlow
-- RemoveFlow
-*/

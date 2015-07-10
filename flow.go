@@ -1,7 +1,62 @@
 package main
 
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"net/http"
+)
+
+// Create creates a new flow
+func (f *Flow) HttpCreate() (resp *http.Response, err error) {
+	var url string = FLOW_POST
+	var method string = "POST"
+
+	if f.Id == "" && f.Path == "" {
+		err = errors.New("Flow path is required")
+		return
+	}
+
+	payload, err := json.Marshal(f)
+	if err != nil {
+		Logger.Error(err)
+		return
+	}
+
+	if f.Id != "" {
+		method = "PUT"
+		url = fmt.Sprintf("%s/%s", url, f.Id)
+	}
+	resp, err = flowHttpRequest(method, payload, url)
+	return
+}
+
 // Create creates a new flow
 func (f *Flow) Create() (err error) {
+	var resp *http.Response
+
+	if !flowthings.Config.Websocket {
+		resp, err = f.HttpCreate()
+		if err != nil {
+			Logger.Error(err)
+			return
+		}
+		defer resp.Body.Close()
+	}
+
+	flowCreateResp := struct {
+		Head ResponseHead
+		Body Flow
+	}{}
+
+	json.NewDecoder(resp.Body).Decode(&flowCreateResp)
+	if flowCreateResp.Head.Status != StatusResourceCreated &&
+		flowCreateResp.Head.Status != StatusResourceUpdated {
+		err = &flowCreateResp.Head
+		return
+	}
+
+	*f = flowCreateResp.Body
 	return
 }
 
@@ -12,7 +67,7 @@ func (f *Flow) Read() (err error) {
 
 // Update updates specific flow
 func (f *Flow) Update() (err error) {
-	return
+	return f.Create()
 }
 
 // Delete removes a flow

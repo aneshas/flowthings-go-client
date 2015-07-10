@@ -34,6 +34,33 @@ func main() {
 	}
 
 	/* Flows */
+	/*flow := Flow{
+		Path:        "/anes/new_flow_from_go_plugin",
+		Description: "Flow created with go plugin",
+		Capacity:    1000,
+	}
+
+	err = flow.Create()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(flow)*/
+
+	flow := Flow{}
+
+	flow.Id = "f559fa0ce68056d07d5137534"
+	flow.Description = "Edited flow description"
+	flow.Capacity = 100
+
+	err = flow.Update()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(flow)
 
 	/* Drops */
 	/*
