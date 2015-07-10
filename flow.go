@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-// Create creates a new flow
+// Create creates a new flow via http api call
 func (f *Flow) HttpCreate() (resp *http.Response, err error) {
 	var url string = FLOW_POST
 	var method string = "POST"
@@ -70,8 +70,46 @@ func (f *Flow) Update() (err error) {
 	return f.Create()
 }
 
+// HttpDelete removes a flow via http call
+func (f *Flow) HttpDelete() (resp *http.Response, err error) {
+	url := fmt.Sprintf("%s/%s", FLOW_POST, f.Id)
+
+	if f.Id == "" {
+		err = errors.New("Flow Id not set")
+		return
+	}
+
+	resp, err = flowHttpDeleteRequest(url)
+	if err != nil {
+		Logger.Error(err)
+	}
+	return
+}
+
 // Delete removes a flow
 func (f *Flow) Delete() (err error) {
+	var resp *http.Response
+
+	if !flowthings.Config.Websocket {
+		resp, err = f.HttpDelete()
+		if err != nil {
+			Logger.Error(err)
+			return
+		}
+		defer resp.Body.Close()
+	}
+
+	deleteResp := struct {
+		Head ResponseHead
+	}{}
+	json.NewDecoder(resp.Body).Decode(deleteResp)
+	if deleteResp.Head.Status != StatusResourceDeleted {
+		err = &deleteResp.Head
+		return
+	}
+	emptyFlow := Flow{}
+	*f = emptyFlow
+
 	return
 }
 

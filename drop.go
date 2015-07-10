@@ -96,7 +96,7 @@ func (d *Drop) HttpDelete() (resp *http.Response, err error) {
 
 // Delete deletes a drop from a flow via http or websocket
 // If Drop Id is not provided, all drops from flow will be deleted
-func (d *Drop) Delete() (rh ResponseHead, err error) {
+func (d *Drop) Delete() (err error) {
 	deleteResp := struct {
 		Head ResponseHead
 	}{}
@@ -121,7 +121,6 @@ func (d *Drop) Delete() (rh ResponseHead, err error) {
 		err = &deleteResp.Head
 		return
 	}
-	rh = deleteResp.Head
 	emptyDrop := Drop{}
 	*d = emptyDrop
 

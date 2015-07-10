@@ -51,10 +51,10 @@ func main() {
 	flow := Flow{}
 
 	flow.Id = "f559fa0ce68056d07d5137534"
-	flow.Description = "Edited flow description"
-	flow.Capacity = 100
+	//flow.Description = "Edited flow description"
+	//flow.Capacity = 100
 
-	err = flow.Update()
+	err = flow.Delete()
 	if err != nil {
 		fmt.Println(err)
 		return
