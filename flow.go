@@ -117,3 +117,8 @@ func (f *Flow) Delete() (err error) {
 func (f *Flow) TrackTo(flows ...Flow) (t Track, err error) {
 	return
 }
+
+// Children returns children flows
+func (f *Flow) Children() (flows []Flow) {
+	return
+}

@@ -28,7 +28,7 @@ const (
 	StatusServiceUnavailable int = 503
 )
 
-var DebugLevel int
+var Debug bool
 var Logger ILogger
 var flowthings *Flowthings
 
@@ -80,7 +80,12 @@ func flowHttpRequest(
 	url string) (resp *http.Response, err error) {
 
 	httpClient := http.Client{}
-	req, err := prepareHttpHeadersAndUrl(method, url, bytes.NewBuffer(payload))
+
+	req, err := prepareHttpHeadersAndUrl(
+		method,
+		url,
+		bytes.NewBuffer(payload))
+
 	resp, err = httpClient.Do(req)
 
 	return

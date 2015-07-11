@@ -9,6 +9,7 @@ import (
 
 /*
 TODO
+Implement io.Reader and io.Writer for flows so we can use for ex. fmt.Fprintf(&flow, []byte(encoded json))
 Track methods:
 - AddFlow
 - RemoveFlow
