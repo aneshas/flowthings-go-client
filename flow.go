@@ -102,11 +102,13 @@ func (f *Flow) Delete() (err error) {
 	deleteResp := struct {
 		Head ResponseHead
 	}{}
+
 	json.NewDecoder(resp.Body).Decode(deleteResp)
 	if deleteResp.Head.Status != StatusResourceDeleted {
 		err = &deleteResp.Head
 		return
 	}
+
 	emptyFlow := Flow{}
 	*f = emptyFlow
 
