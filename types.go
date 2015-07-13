@@ -10,6 +10,8 @@ import (
 
 /* Types */
 type (
+
+	// TODO Add descriptions
 	Flowthings struct {
 		SessionId string
 		Ws        *websocket.Conn
@@ -57,7 +59,7 @@ type (
 		Filter       string `json:"filter,omitempty"`
 		Capacity     int    `json:"capacity,omitempty"`
 		CreationDate int64  `json:"creationDate,omitempty"`
-		LastEditDate int64  `json:lastEditDate,omitempty`
+		LastEditDate int64  `json:"lastEditDate,omitempty"`
 	}
 
 	Track struct {
