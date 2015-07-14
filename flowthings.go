@@ -133,6 +133,7 @@ func NewFlowthings(config FlowConfig) (ft *Flowthings, err error) {
 		Head ResponseHead
 		Body authResponseBody
 	}{}
+
 	json.NewDecoder(resp.Body).Decode(&response)
 	if response.Head.Status != StatusResourceCreated {
 		err = &response.Head

@@ -11,19 +11,21 @@ import (
 /* Types */
 type (
 
-	// TODO Add descriptions
+	// Global Flowthings object
 	Flowthings struct {
 		SessionId string
 		Ws        *websocket.Conn
 		Config    *FlowConfig
 	}
 
+	// FlowConfig is used for authentication
 	FlowConfig struct {
 		Username  string
 		Token     string
 		Websocket bool
 	}
 
+	// Response head
 	ResponseHead struct {
 		Ok       bool
 		Status   int
@@ -35,12 +37,14 @@ type (
 		Id string
 	}
 
+	// Drop location
 	Location struct {
 		Lat        float64           `json:"lat"`
 		Lon        float64           `json:"lon"`
 		Specifiers map[string]string `json:"specifiers,omitempty"`
 	}
 
+	// Flowthings Drop object
 	Drop struct {
 		Id           string      `json:"id,omitempty"`
 		FlowId       string      `json:"flowId,omitempty"`
@@ -52,6 +56,8 @@ type (
 	}
 
 	// TODO implement io.ReadWriter for flow and Stringer for all primitives
+
+	// Flowthings Flow object
 	Flow struct {
 		Id           string `json:"id,omitempty"`
 		Path         string `json:"path"`
@@ -62,6 +68,7 @@ type (
 		LastEditDate int64  `json:"lastEditDate,omitempty"`
 	}
 
+	// Flowthings Track object
 	Track struct {
 		Id          string   `json:"id,omitempty"`
 		Source      string   `json:"source"`
