@@ -1,3 +1,17 @@
+/*
+	TODO
+	Change drop receiverst to Drop struct
+	remove return drops (use receiver struct)
+
+	Flow methods:
+	- TrackFrom
+	- TrackTo
+
+	Track methods:
+	- AddFlow
+	- RemoveFlow
+*/
+
 package main
 
 import (
@@ -164,17 +178,3 @@ func (d *Drop) Read() (err error) {
 
 	return
 }
-
-/*
-TODO
-Change drop receiverst to Drop struct
-remove return drops (use receiver struct)
-
-Flow methods:
-- TrackFrom
-- TrackTo
-
-Track methods:
-- AddFlow
-- RemoveFlow
-*/
