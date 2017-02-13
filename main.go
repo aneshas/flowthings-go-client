@@ -21,7 +21,7 @@ func init() {
 func main() {
 
 	// Authenticate
-	config := FlowConfig{
+	config := FlowConfig {
 		Username:  os.Getenv("FT_USERNAME"),
 		Token:     os.Getenv("FT_TOKEN"),
 		Websocket: false,
